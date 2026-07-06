@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="FileConverter.Api/FileConverter.Api.csproj" Id="fbbaf076-873f-49ae-b2d2-4a4cfecbf38e" />
+  <Project Path="FileConverter.Application/FileConverter.Application.csproj" Id="67201bb9-13e9-4eef-b054-8eeb96c75cb4" />
+  <Project Path="FileConverter.Domain/FileConverter.Domain.csproj" Id="a1b5a1bf-7eff-4f8d-9483-e2b51fd7abfe" />
+  <Project Path="FileConverter.Infrastracture/FileConverter.Infrastracture.csproj" Id="933bd8ae-37fd-4992-9fec-856c2b3b6004" />
+</Solution>

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <SixLaborsLicenseKey>
+            Id=ctm_01kts6xrj5k6sx0ze489e3zdec;Kind=Community;ExpiryDateUtc=2027-09-08T16:47:52.0236111Z;\
+            Key=wWiZEw2qwTa8KAlL4uP+80Ko0kqn3G7yqajFmn4sFN2qoDag7hajhAEhVlbUWOntQHY2PLsfH9YyrTICocID4Q==
+        </SixLaborsLicenseKey>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="pythonnet" Version="3.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FileConverter.Application\FileConverter.Application.csproj" />
+    </ItemGroup>
+
+</Project>
