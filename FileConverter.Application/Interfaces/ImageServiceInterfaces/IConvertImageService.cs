@@ -1,5 +1,4 @@
-﻿using FileConverter.Domain.Enums;
-using FileConverter.Domain.Models;
+﻿using FileConverter.Domain.Models;
 
 namespace FileConverter.Application.Interfaces.ImageServiceInterfaces;
 
