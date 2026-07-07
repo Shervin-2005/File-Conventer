@@ -5,7 +5,7 @@ namespace FileConverter.Application.Interfaces.AudioServiceInterfaces
     public interface IConvertAudioService
     {
         Task<ConversionStreamResult> ConvertStreamAudioAsync(
-            Stream inputImage,
+            Stream inputAudio,
             string originalFileName,
             string targetExtension,
             CancellationToken cancellationToken);

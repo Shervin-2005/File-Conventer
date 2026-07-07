@@ -6,6 +6,10 @@ using FileConverter.Application.UseCases.Implementations.ImagesConversionImpleme
 using FileConverter.Application.UseCases.Interfaces.DocumentConversionInterfaces;
 using FileConverter.Application.UseCases.Interfaces.ImagesConversionsInterfaces;
 using FileConverter.Infrastracture.Images;
+using FileConverter.Application.Interfaces.AudioServiceInterfaces;
+using FileConverter.Infrastracture.Audios;
+using FileConverter.Application.UseCases.Interfaces.AudioInterfaces;
+using FileConverter.Application.UseCases.Implementations.AudioImplementations;
 
 namespace FileConverter.Api.DependencyInjection;
 
@@ -31,10 +35,13 @@ public static class ServiceExtensions
         services.AddScoped<IConvertImagesToPdfService, ImagesToPdfService>();
         services.AddScoped<IPdfInspectionService, PdfInspectionService>();
 
-        //imagess
-        services.AddScoped<IConvertImageUseCase, ConvertImageUseCase>();
+        //images
+        services.AddScoped<IConvertImageSevice, ConvertImageSevice>();
         services.AddScoped<IImageInsparationService, ImageInsparationService>();
 
+        //Audios
+        services.AddScoped<IConvertAudioService, ConvertAudioService>();
+        services.AddScoped<IAudioInspectionService, AudioInspectionService>();
         return services;
     }
 
@@ -48,8 +55,10 @@ public static class ServiceExtensions
         services.AddScoped<IConvertImageToPdfUsecase, ConvertImageToPdfUsecase>();
 
         //images
-        services.AddScoped<IConvertImageSevice, ConvertImageSevice>();
+        services.AddScoped<IConvertImageUseCase, ConvertImageUseCase>();
 
+        //Audios
+        services.AddScoped<IConvertAudioUseCase, ConvertAudioUsecase>();
         return services;
     }
 }

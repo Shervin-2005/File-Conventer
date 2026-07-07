@@ -11,24 +11,31 @@ namespace FileConverter.Infrastracture.Images
                 case ".png":
                     initialFormat = ImageFormat.Png;
                     return true;
+
                 case ".jpg":
                     initialFormat = ImageFormat.Jpg;
                     return true;
+
                 case ".jpeg":
                     initialFormat = ImageFormat.Jpeg;
                     return true;
+
                 case ".webp":
                     initialFormat = ImageFormat.Webp;
                     return true;
+
                 case ".bmp":
                     initialFormat = ImageFormat.Bmp;
                     return true;
+
                 case ".gif":
                     initialFormat = ImageFormat.Gif;
                     return true;
+
                 case ".heif":
                     initialFormat = ImageFormat.Heif;
                     return true;
+
                 default:
                     initialFormat = default;
                     return false;

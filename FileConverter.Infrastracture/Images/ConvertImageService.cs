@@ -30,7 +30,7 @@ public class ConvertImageSevice : IConvertImageSevice
 
             await Task.Run(() => RunPyScript(imageFilePath, outputPath, targetExtension));
 
-            // 4. Read the converted .docx back into memory so we can return it
+            // 4. Read the converted image back into memory so we can return it
             var resultStream = new MemoryStream();
             using (var convertedFile = new FileStream(outputPath, FileMode.Open, FileAccess.Read))
             {
