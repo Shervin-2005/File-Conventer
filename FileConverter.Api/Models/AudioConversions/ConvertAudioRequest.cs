@@ -7,6 +7,6 @@ namespace FileConverter.Api.Models.AudioConversions
     {
         [Required(ErrorMessage = "فایل صوتی مورد نظر را انتخاب کنید")]
         public IFormFile File { get; set; } = null!;
-        public ImageFormat TargetFormat { get; set; }
+        public AudioFormat TargetFormat { get; set; }
     }
 }
