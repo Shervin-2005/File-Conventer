@@ -8,9 +8,9 @@ namespace FileConverter.Application.UseCases.Implementations.ImagesConversionImp
 public class ConvertImageUseCase : IConvertImageUseCase
 {
     private readonly IConvertImageSevice _convertImageSevice;
-    private readonly IImageInsparationService _imageInsparationService;
+    private readonly IImageInspectionService _imageInsparationService;
 
-    public ConvertImageUseCase(IConvertImageSevice convertImageSevice, IImageInsparationService imageInsparationService)
+    public ConvertImageUseCase(IConvertImageSevice convertImageSevice, IImageInspectionService imageInsparationService)
     {
         _convertImageSevice = convertImageSevice;
         _imageInsparationService = imageInsparationService;

@@ -2,7 +2,7 @@
 using FileConverter.Domain.Enums;
 namespace FileConverter.Infrastracture.Images
 {
-    public class ImageInsparationService : IImageInsparationService
+    public class ImageInspectionService : IImageInspectionService
     {
         public bool GetImageFormatFromExtension(string extension, out ImageFormat initialFormat)
         {

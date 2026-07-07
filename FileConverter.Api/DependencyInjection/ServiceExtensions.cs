@@ -10,6 +10,10 @@ using FileConverter.Application.Interfaces.AudioServiceInterfaces;
 using FileConverter.Infrastracture.Audios;
 using FileConverter.Application.UseCases.Interfaces.AudioInterfaces;
 using FileConverter.Application.UseCases.Implementations.AudioImplementations;
+using FileConverter.Application.Interfaces.VideoServiceInterfaces;
+using FileConverter.Infrastracture.Videos;
+using FileConverter.Application.UseCases.Interfaces.VideoInterfaces;
+using FileConverter.Application.UseCases.Implementations.VideosConversionsImplementations;
 
 namespace FileConverter.Api.DependencyInjection;
 
@@ -37,11 +41,16 @@ public static class ServiceExtensions
 
         //images
         services.AddScoped<IConvertImageSevice, ConvertImageSevice>();
-        services.AddScoped<IImageInsparationService, ImageInsparationService>();
+        services.AddScoped<IImageInspectionService, ImageInspectionService>();
 
         //Audios
         services.AddScoped<IConvertAudioService, ConvertAudioService>();
         services.AddScoped<IAudioInspectionService, AudioInspectionService>();
+
+        //videos
+        services.AddScoped<IConvertVideoService, ConvertVideoService>();
+        services.AddScoped<IVideoInspection, VideoInspectionService>();
+
         return services;
     }
 
@@ -59,6 +68,10 @@ public static class ServiceExtensions
 
         //Audios
         services.AddScoped<IConvertAudioUseCase, ConvertAudioUsecase>();
+
+        //videos
+        services.AddScoped<IConvertVideoUsecase, ConvertVideoUsecase>();
+
         return services;
     }
 }
