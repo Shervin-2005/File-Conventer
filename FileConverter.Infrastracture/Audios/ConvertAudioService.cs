@@ -71,18 +71,24 @@ namespace FileConverter.Infrastracture.Audios
                 Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
                 PythonEngine.Initialize();
             }
-
             using (Py.GIL())
             {
-                dynamic sys = Py.Import("sys");
-                sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Audios\PythonScripts");
+                try
+                {
+                    dynamic sys = Py.Import("sys");
+                    sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Audios\PythonScripts");
 
-                var audio = new PyString(audioFilePath);
-                var output = new PyString(outputPath);
-                var format = new PyString(targetExtension);
+                    var audio = new PyString(audioFilePath);
+                    var output = new PyString(outputPath);
+                    var format = new PyString(targetExtension);
 
-                var pythonScript = Py.Import("AudioConverter");
-                pythonScript.InvokeMethod("ConvertAudio", new PyObject[] { audio, output, format });
+                    var pythonScript = Py.Import("AudioConverter");
+                    pythonScript.InvokeMethod("ConvertAudio", new PyObject[] { audio, output, format });
+                }
+                catch (PythonException pyEx)
+                {
+                    throw new Exception($"Python script failed: {pyEx.Message}", pyEx);
+                }
             }
         }
     }
