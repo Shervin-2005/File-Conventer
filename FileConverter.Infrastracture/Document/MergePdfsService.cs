@@ -20,7 +20,7 @@ namespace FileConverter.Infrastracture.Document
 
             try
             {
-                // 1. Save every incoming stream to a real file on disk (Python needs file paths)
+                // 1. ذخیره فایل‌ها در دیسک برای دسترسی پایتون
                 for (int i = 0; i < pdfs.Count; i++)
                 {
                     string filePath = Path.Combine(tempFolder, $"{i}_{fileNames[i]}");
@@ -31,7 +31,7 @@ namespace FileConverter.Infrastracture.Document
                     savedPaths.Add(filePath);
                 }
 
-                // 2. Run the Python merge script
+                // 2. اجرای اسکریپت پایتون
                 await Task.Run(() => RunPyScript(savedPaths, outputPath), cancellationToken);
 
                 var resultStream = new MemoryStream();
@@ -78,26 +78,22 @@ namespace FileConverter.Infrastracture.Document
 
             string combined = string.Join("_", namesWithoutExtension);
 
+            // اگر نام خیلی طولانی شد یا تعداد فایل‌ها زیاد بود، نام عمومی می‌دهیم
             if (fileNames.Count <= 3 && combined.Length <= 50)
             {
                 return combined + ".pdf";
             }
 
-            return $"pdfs{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
+            return $"Merged_Pdfs_{DateTime.Now:yyyyMMdd_HHmmss}.pdf";
         }
 
         private static void RunPyScript(List<string> pdfFilePaths, string outputPath)
         {
-            if (!PythonEngine.IsInitialized)
-            {
-                Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
-                PythonEngine.Initialize();
-            }
-
+            // از مقداردهی اولیه سراسری (در Program.cs) استفاده می‌کنیم
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
-                sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Document\PythonScripts");
+                sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Document\PythonScripts");
 
                 using var pyPathsList = new PyList();
                 foreach (var path in pdfFilePaths)
@@ -110,7 +106,6 @@ namespace FileConverter.Infrastracture.Document
                 var pythonScript = Py.Import("MergePdf");
                 pythonScript.InvokeMethod("MergePdfs", new PyObject[] { pyPathsList, output });
             }
-
         }
     }
 }

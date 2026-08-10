@@ -19,4 +19,14 @@ def ConvertImage(imagePath, outputPath, targetFormat):
     elif image.mode == "P" and target != "GIF":
         image = image.convert("RGB")
 
-    image.save(outputPath, target)
+    # 💡 شرط مخصوص فرمت ICO اضافه شد
+    if target == "ICO":
+        # برای آیکون داشتن پس‌زمینه شفاف (RGBA) بهتر است
+        if image.mode != "RGBA":
+            image = image.convert("RGBA")
+
+        # فرمت آیکون در Pillow نیازمند سایز استاندارد است (حداکثر 256x256)
+        image.save(outputPath, format=target, sizes=[(256, 256)])
+    else:
+        # ذخیره برای سایر فرمت‌ها
+        image.save(outputPath, target)

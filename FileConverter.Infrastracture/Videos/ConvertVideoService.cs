@@ -21,15 +21,16 @@ namespace FileConverter.Infrastracture.Videos
 
             try
             {
-                // 2. Save the incoming stream to a real file on disk (Python needs a file path)
+                // Save the incoming stream to a real file on disk
                 using (var fileStream = new FileStream(videoFilePath, FileMode.Create, FileAccess.Write))
                 {
                     await inputvideo.CopyToAsync(fileStream, cancellationToken);
                 }
 
-                await Task.Run(() => RunPyScript(videoFilePath, outputPath, targetExtension));
+                // ارسال cancellationToken به Task.Run
+                await Task.Run(() => RunPyScript(videoFilePath, outputPath, targetExtension), cancellationToken);
 
-                // 4. Read the converted video back into memory so we can return it
+                // Read the converted video back into memory
                 var resultStream = new MemoryStream();
                 using (var convertedFile = new FileStream(outputPath, FileMode.Open, FileAccess.Read))
                 {
@@ -37,14 +38,26 @@ namespace FileConverter.Infrastracture.Videos
                 }
                 resultStream.Position = 0;
 
+                // 💡 تولید ContentType پویا بر اساس فرمت درخواستی
+                string contentType = targetExtension.ToLower() switch
+                {
+                    "mp4" => "video/mp4",
+                    "mkv" => "video/x-matroska",
+                    "webm" => "video/webm",
+                    "avi" => "video/x-msvideo",
+                    "mov" => "video/quicktime",
+                    "gif" => "image/gif",
+                    _ => "application/octet-stream"
+                };
+
                 return new ConversionStreamResult(
                     OutputStream: resultStream,
                     FileName: outputFileName,
-                    ContentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.image",
+                    ContentType: contentType, // 💡 به جای فرمت ثابت عکس، از این متغیر استفاده می‌شود
                     SizeInBytes: resultStream.Length,
                     Success: true,
                     ErrorMessage: null
-                    );
+                );
             }
             catch (Exception ex)
             {
@@ -65,25 +78,33 @@ namespace FileConverter.Infrastracture.Videos
                 }
             }
         }
+
         private static void RunPyScript(string videoFilePath, string outputPath, string targetExtension)
         {
             if (!PythonEngine.IsInitialized)
             {
-                Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
+                Runtime.PythonDLL = @"C:\Users\Webhouse\AppData\Local\Programs\Python\Python314\python314.dll";
                 PythonEngine.Initialize();
             }
 
             using (Py.GIL())
             {
-                dynamic sys = Py.Import("sys");
-                sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Videos\PythonScripts");
+                try
+                {
+                    dynamic sys = Py.Import("sys");
+                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Videos\PythonScripts");
+                    var video = new PyString(videoFilePath);
+                    var output = new PyString(outputPath);
+                    var format = new PyString(targetExtension);
 
-                var video = new PyString(videoFilePath);
-                var output = new PyString(outputPath);
-                var format = new PyString(targetExtension);
-
-                var pythonScript = Py.Import("VideoConverter");
-                pythonScript.InvokeMethod("ConvertVideo", new PyObject[] { video, output, format });
+                    var pythonScript = Py.Import("VideoConverter");
+                    pythonScript.InvokeMethod("ConvertVideo", new PyObject[] { video, output, format });
+                }
+                catch (PythonException pyEx)
+                {
+                    // 💡 برای ردیابی راحت‌تر ارورهای احتمالی پایتون
+                    throw new Exception($"Python script failed: {pyEx.Message}", pyEx);
+                }
             }
         }
     }

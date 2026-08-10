@@ -93,29 +93,42 @@ namespace FileConverter.Infrastracture.Document
 
         private static void RunPyScript(List<string> pdfFilePaths, string outputPath)
         {
-            if (!PythonEngine.IsInitialized)
-            {
-                Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
-                PythonEngine.Initialize();
-            }
-
+            // Python engine is already initialized once at app startup (Program.cs).
+            // Just acquire the GIL here and run the conversion — do NOT call
+            // PythonEngine.Initialize() again here. This method runs inside
+            // Task.Run (a thread-pool thread), and re-initializing the Python
+            // engine from a different thread than the one that first initialized
+            // it (and possibly with a different Runtime.PythonDLL path) can
+            // crash the native Python runtime and take down the whole ASP.NET
+            // process — which is exactly what shows up in the browser as
+            // ERR_CONNECTION_RESET / ERR_CONNECTION_ABORTED.
             using (Py.GIL())
             {
-                dynamic sys = Py.Import("sys");
-                sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Document\PythonScripts");
-
-                using var pyPathsList = new PyList();
-                foreach (var path in pdfFilePaths)
+                try
                 {
-                    pyPathsList.Append(new PyString(path));
+                    dynamic sys = Py.Import("sys");
+                    // ⚠️ Make sure this path actually points to the current
+                    // project's PythonScripts folder (it should match the same
+                    // base path used in DocxToPdfConversionService — double check
+                    // this hasn't gone stale after a folder rename/move).
+                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Document\PythonScripts");
+
+                    using var pyPathsList = new PyList();
+                    foreach (var path in pdfFilePaths)
+                    {
+                        pyPathsList.Append(new PyString(path));
+                    }
+
+                    var output = new PyString(outputPath);
+
+                    var pythonScript = Py.Import("ImagesToPdf");
+                    pythonScript.InvokeMethod("ConvertImagesToPdf", new PyObject[] { pyPathsList, output });
                 }
-
-                var output = new PyString(outputPath);
-
-                var pythonScript = Py.Import("ImagesToPdf");
-                pythonScript.InvokeMethod("ConvertImagesToPdf", new PyObject[] { pyPathsList, output });
+                catch (PythonException pyEx)
+                {
+                    throw new Exception($"Python script failed: {pyEx.Message}", pyEx);
+                }
             }
-
         }
     }
 }

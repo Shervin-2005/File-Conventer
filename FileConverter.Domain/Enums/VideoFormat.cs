@@ -7,5 +7,6 @@
         Mov,
         Mkv,
         Webm,
+        Gif
     }
 }

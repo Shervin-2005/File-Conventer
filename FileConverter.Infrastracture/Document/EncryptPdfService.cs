@@ -26,9 +26,9 @@ namespace FileConverter.Infrastracture.Document
                     await inputDocument.CopyToAsync(fileStream, cancellationToken);
                 }
 
-                await Task.Run(() => RunPyScript(pdfFilePath, outputPath ,password), cancellationToken);
+                await Task.Run(() => RunPyScript(pdfFilePath, outputPath, password), cancellationToken);
 
-                // 4. Read the converted .pdf back into memory so we can return it
+                // Read the converted .pdf back into memory so we can return it
                 var resultStream = new MemoryStream();
                 using (var convertedFile = new FileStream(outputPath, FileMode.Open, FileAccess.Read))
                 {
@@ -39,7 +39,7 @@ namespace FileConverter.Infrastracture.Document
                 return new ConversionStreamResult(
                     OutputStream: resultStream,
                     FileName: outputFileName,
-                    ContentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    ContentType: "application/pdf",
                     SizeInBytes: resultStream.Length,
                     Success: true,
                     ErrorMessage: null
@@ -64,18 +64,15 @@ namespace FileConverter.Infrastracture.Document
                 }
             }
         }
+
         private static void RunPyScript(string pdfFilePath, string outputPath, string password)
         {
-            if (!PythonEngine.IsInitialized)
-            {
-                Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
-                PythonEngine.Initialize();
-            }
-
+            // Python engine is already initialized once at app startup (Program.cs).
+            // Just acquire the GIL here and run the conversion.
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
-                sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Document\PythonScripts");
+                sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Document\PythonScripts");
 
                 var pdf = new PyString(pdfFilePath);
                 var output = new PyString(outputPath);

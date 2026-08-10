@@ -20,15 +20,15 @@ namespace FileConverter.Infrastracture.Audios
 
             try
             {
-                // 2. Save the incoming stream to a real file on disk (Python needs a file path)
+                // Save the incoming stream to a real file on disk (Python needs a file path)
                 using (var fileStream = new FileStream(audioFilePath, FileMode.Create, FileAccess.Write))
                 {
                     await inputAudio.CopyToAsync(fileStream, cancellationToken);
                 }
 
-                await Task.Run(() => RunPyScript(audioFilePath, outputPath, targetExtension));
+                await Task.Run(() => RunPyScript(audioFilePath, outputPath, targetExtension), cancellationToken);
 
-                // 4. Read the converted audio back into memory so we can return it
+                // Read the converted audio back into memory so we can return it
                 var resultStream = new MemoryStream();
                 using (var convertedFile = new FileStream(outputPath, FileMode.Open, FileAccess.Read))
                 {
@@ -36,10 +36,21 @@ namespace FileConverter.Infrastracture.Audios
                 }
                 resultStream.Position = 0;
 
+                // ✅ تعیین ContentType صحیح بر اساس فرمت خروجی صدا
+                string contentType = targetExtension.ToLower() switch
+                {
+                    "mp3" => "audio/mpeg",
+                    "wav" => "audio/wav",
+                    "ogg" => "audio/ogg",
+                    "m4a" => "audio/mp4",
+                    "flac" => "audio/flac",  
+                    _ => "application/octet-stream"
+                };
+
                 return new ConversionStreamResult(
                     OutputStream: resultStream,
                     FileName: outputFileName,
-                    ContentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.image",
+                    ContentType: contentType, // ✅ اصلاح شد
                     SizeInBytes: resultStream.Length,
                     Success: true,
                     ErrorMessage: null
@@ -64,19 +75,19 @@ namespace FileConverter.Infrastracture.Audios
                 }
             }
         }
+
         private static void RunPyScript(string audioFilePath, string outputPath, string targetExtension)
         {
-            if (!PythonEngine.IsInitialized)
-            {
-                Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
-                PythonEngine.Initialize();
-            }
+            // Python engine is already initialized once at app startup (Program.cs).
+            // Just acquire the GIL here and run the conversion.
             using (Py.GIL())
             {
                 try
                 {
                     dynamic sys = Py.Import("sys");
-                    sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Audios\PythonScripts");
+                    
+                    // ✅ مسیر یکپارچه شد مشابه DocxToTextConversionService
+                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Audios\PythonScripts");
 
                     var audio = new PyString(audioFilePath);
                     var output = new PyString(outputPath);

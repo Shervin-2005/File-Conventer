@@ -17,7 +17,7 @@ public class ConvertImageSevice : IConvertImageSevice
         Directory.CreateDirectory(tempFolder);
 
         string imageFilePath = Path.Combine(tempFolder, originalFileName);
-        string outputFileName = Path.GetFileNameWithoutExtension(originalFileName) +"." +targetExtension;
+        string outputFileName = Path.GetFileNameWithoutExtension(originalFileName) + "." + targetExtension;
         string outputPath = Path.Combine(tempFolder, outputFileName);
 
         try
@@ -28,7 +28,7 @@ public class ConvertImageSevice : IConvertImageSevice
                 await inputImage.CopyToAsync(fileStream, cancellationToken);
             }
 
-            await Task.Run(() => RunPyScript(imageFilePath, outputPath, targetExtension));
+            await Task.Run(() => RunPyScript(imageFilePath, outputPath, targetExtension), cancellationToken);
 
             // 4. Read the converted image back into memory so we can return it
             var resultStream = new MemoryStream();
@@ -38,14 +38,26 @@ public class ConvertImageSevice : IConvertImageSevice
             }
             resultStream.Position = 0;
 
+            // ✅ تعیین ContentType صحیح و پویا بر اساس فرمت خروجی تصویر
+            string contentType = targetExtension.ToLower() switch
+            {
+                "webp" => "image/webp",
+                "jpg" or "jpeg" => "image/jpeg",
+                "png" => "image/png",
+                "bmp" => "image/bmp",
+                "gif" => "image/gif",
+                "ico" => "image/x-icon",
+                _ => "application/octet-stream"
+            };
+
             return new ConversionStreamResult(
                 OutputStream: resultStream,
                 FileName: outputFileName,
-                ContentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.image",
+                ContentType: contentType, // ✅ اصلاح شد
                 SizeInBytes: resultStream.Length,
                 Success: true,
                 ErrorMessage: null
-                );
+            );
         }
         catch (Exception ex)
         {
@@ -66,18 +78,21 @@ public class ConvertImageSevice : IConvertImageSevice
             }
         }
     }
+
     private static void RunPyScript(string imageFilePath, string outputPath, string targetExtension)
     {
         if (!PythonEngine.IsInitialized)
         {
-            Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
+            Runtime.PythonDLL = @"C:\Users\Webhouse\AppData\Local\Programs\Python\Python314\python314.dll";
             PythonEngine.Initialize();
         }
 
         using (Py.GIL())
         {
             dynamic sys = Py.Import("sys");
-            sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Images\PythonScripts");
+            
+            // ✅ اصلاح مسیر پایتون مشابه سرویس‌های دیگر (بر اساس ساختار پروژه شما)
+            sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Images\PythonScripts");
 
             var image = new PyString(imageFilePath);
             var output = new PyString(outputPath);

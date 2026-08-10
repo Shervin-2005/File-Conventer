@@ -9,5 +9,6 @@
         Bmp,
         Gif,
         Heif,
+        Ico
     }
 }

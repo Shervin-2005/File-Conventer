@@ -1,5 +1,6 @@
 ﻿using FileConverter.Application.Interfaces.ImageServiceInterfaces;
 using FileConverter.Domain.Enums;
+
 namespace FileConverter.Infrastracture.Images
 {
     public class ImageInspectionService : IImageInspectionService
@@ -36,6 +37,11 @@ namespace FileConverter.Infrastracture.Images
                     initialFormat = ImageFormat.Heif;
                     return true;
 
+                // 💡 این بخش اضافه شد
+                case ".ico":
+                    initialFormat = ImageFormat.Ico;
+                    return true;
+
                 default:
                     initialFormat = default;
                     return false;
@@ -44,7 +50,6 @@ namespace FileConverter.Infrastracture.Images
 
         public bool GetImageTargetForamtFromEnum(ImageFormat targetFormat, out string targetExtension)
         {
-
             switch (targetFormat)
             {
                 case ImageFormat.Png:
@@ -73,6 +78,11 @@ namespace FileConverter.Infrastracture.Images
 
                 case ImageFormat.Heif:
                     targetExtension =  "heif";
+                    return true;
+
+                // 💡 این بخش اضافه شد
+                case ImageFormat.Ico:
+                    targetExtension = "ico";
                     return true;
 
                 default:
