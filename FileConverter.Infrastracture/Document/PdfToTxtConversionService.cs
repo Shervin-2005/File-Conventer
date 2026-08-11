@@ -47,6 +47,10 @@ namespace FileConverter.Infrastracture.Document
                     ErrorMessage: null
                     );
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 return new ConversionStreamResult(

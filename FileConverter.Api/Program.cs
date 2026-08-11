@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Initialize the embedded Python runtime ONCE, before anything else
 // (DI container, Swagger reflection, etc.) can touch Python.Runtime.
-Runtime.PythonDLL = @"C:\Users\Webhouse\AppData\Local\Programs\Python\Python314\python314.dll";
+Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
 PythonEngine.Initialize();
 PythonEngine.BeginAllowThreads();
 
