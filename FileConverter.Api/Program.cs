@@ -1,8 +1,17 @@
 using FileConverter.Api.DependencyInjection;
-using Python.Runtime;
+using FileConverter.Infrastracture.Data;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
+using Python.Runtime;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionString =
+    Environment.GetEnvironmentVariable("FILE_CONVERTER")
+ ?? throw new Exception("Environment variable FILE_CONVERTER is not set");
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(connectionString));
 
 // Initialize the embedded Python runtime ONCE, before anything else
 // (DI container, Swagger reflection, etc.) can touch Python.Runtime.

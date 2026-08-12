@@ -21,8 +21,6 @@ namespace FileConverter.Infrastracture.Data.Configurations
             builder.Property(u => u.UserName).HasMaxLength(100);
 
             builder.HasIndex(u => u.PhoneNumber).IsUnique();
-
-            builder.HasQueryFilter(u => !u.IsDeleted);
         }
     }
 }
