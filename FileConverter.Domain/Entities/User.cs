@@ -13,5 +13,7 @@ namespace FileConverter.Domain.Entities
         public DateTime? DeletedAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         public DateTime? UpdatedAt { get; set; }
+
+        public ICollection<ConversionJob> ConversionJobs { get; set; } = new List<ConversionJob>();
     }
 }
