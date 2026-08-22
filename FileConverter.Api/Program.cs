@@ -1,4 +1,5 @@
 using FileConverter.Api.DependencyInjection;
+using FileConverter.Application.Mappings;
 using FileConverter.Infrastracture.Data;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 Runtime.PythonDLL = @"C:\Users\CLINIC\AppData\Local\Programs\Python\Python314\python314.dll";
 PythonEngine.Initialize();
 PythonEngine.BeginAllowThreads();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.LicenseKey = builder.Configuration["AutoMapper:ServiceApiKey"];
+}, typeof(MappingProfile));
 
 // Add services to the container.
 
