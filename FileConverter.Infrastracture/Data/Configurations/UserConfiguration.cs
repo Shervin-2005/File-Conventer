@@ -16,15 +16,22 @@ namespace FileConverter.Infrastracture.Data.Configurations
                 .HasMaxLength(20);
 
             builder.HasIndex(u => u.PhoneNumber)
-                .IsUnique()
-                .HasFilter("[IsDeleted] = 0");
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false")
+            .HasDatabaseName("IX_Users_PhoneNumber_Unique");
 
             builder.Property(u => u.PasswordHash)
                 .HasMaxLength(500);
 
             builder.Property(u => u.Role)
-                .IsRequired()
-                 .HasDefaultValue(UserRole.Customer);
+            .IsRequired()
+            .HasDefaultValue(UserRole.Customer)
+            .HasConversion<int>();
+
+            builder.HasIndex(u => u.UserName)
+           .IsUnique()
+           .HasFilter("\"IsDeleted\" = false")
+           .HasDatabaseName("IX_Users_UserName_Unique");
 
             builder.Property(u => u.UserName).HasMaxLength(100);
 
