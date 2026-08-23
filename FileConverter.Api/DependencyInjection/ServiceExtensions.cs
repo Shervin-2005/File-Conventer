@@ -1,19 +1,24 @@
-using FileConverter.Application.Interfaces.ImageServiceInterfaces;
+using FileConverter.Application.Interfaces;
+using FileConverter.Application.Interfaces.AudioServiceInterfaces;
+using FileConverter.Application.Interfaces.AuthInterfaces;
 using FileConverter.Application.Interfaces.DocumentServiceInterfaces;
-using FileConverter.Infrastracture.Document;
+using FileConverter.Application.Interfaces.ImageServiceInterfaces;
+using FileConverter.Application.Interfaces.VideoServiceInterfaces;
+using FileConverter.Application.UseCases.Implementations.AudioImplementations;
+using FileConverter.Application.UseCases.Implementations.AuthImplementations;
 using FileConverter.Application.UseCases.Implementations.DocumentConversionImplementations;
 using FileConverter.Application.UseCases.Implementations.ImagesConversionImplementations;
+using FileConverter.Application.UseCases.Implementations.VideosConversionsImplementations;
+using FileConverter.Application.UseCases.Interfaces.AudioInterfaces;
+using FileConverter.Application.UseCases.Interfaces.AuthInterfaces;
 using FileConverter.Application.UseCases.Interfaces.DocumentConversionInterfaces;
 using FileConverter.Application.UseCases.Interfaces.ImagesConversionsInterfaces;
-using FileConverter.Infrastracture.Images;
-using FileConverter.Application.Interfaces.AudioServiceInterfaces;
-using FileConverter.Infrastracture.Audios;
-using FileConverter.Application.UseCases.Interfaces.AudioInterfaces;
-using FileConverter.Application.UseCases.Implementations.AudioImplementations;
-using FileConverter.Application.Interfaces.VideoServiceInterfaces;
-using FileConverter.Infrastracture.Videos;
 using FileConverter.Application.UseCases.Interfaces.VideoInterfaces;
-using FileConverter.Application.UseCases.Implementations.VideosConversionsImplementations;
+using FileConverter.Infrastracture.Services.Audios;
+using FileConverter.Infrastracture.Services.Document;
+using FileConverter.Infrastracture.Services.Images;
+using FileConverter.Infrastracture.Services.Videos;
+using Infrastructure.Services;
 
 namespace FileConverter.Api.DependencyInjection;
 
@@ -51,6 +56,14 @@ public static class ServiceExtensions
         services.AddScoped<IConvertVideoService, ConvertVideoService>();
         services.AddScoped<IVideoInspection, VideoInspectionService>();
 
+        //Auth
+        services.AddScoped<IPasswordHasher, PasswordHasherService>();
+        services.AddScoped<ISmsService,  SmsService>();
+        services.AddScoped<ITokenService, TokenService>();
+
+        //User
+        services.AddScoped<IImageStorageService, S3ImageStorageService>();
+
         return services;
     }
 
@@ -71,6 +84,11 @@ public static class ServiceExtensions
 
         //videos
         services.AddScoped<IConvertVideoUsecase, ConvertVideoUsecase>();
+
+        //Auth
+        services.AddScoped<IAuthUseCase, AuthUseCase>();
+        services.AddScoped<IOtpUseCase, OtpUseCase>();
+        services.AddScoped<IUserUseCase, UserUseCase>();
 
         return services;
     }
