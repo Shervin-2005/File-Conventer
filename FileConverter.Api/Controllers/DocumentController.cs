@@ -1,6 +1,12 @@
 ﻿using FileConverter.Api.Models.DocumentConversions;
+using FileConverter.Application.UseCases.Implementations;
+using FileConverter.Application.UseCases.Implementations.DocumentConversionImplementations;
+using FileConverter.Application.UseCases.Interfaces;
 using FileConverter.Application.UseCases.Interfaces.DocumentConversionInterfaces;
+using FileConverter.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Security.Claims;
 
 namespace FileConverter.Api.Controllers
 {
@@ -11,18 +17,21 @@ namespace FileConverter.Api.Controllers
         private readonly IEncryptDocumentUsecase _encryptDocumentUsecase;
         private readonly IDecryptDocumentUsecase _decryptDocumentUsecase;
         private readonly IConvertImageToPdfUsecase _convertImageToPdfUsecase;
+        private readonly IConversionJobOrchestrator _conversionJobOrchestrator;
 
         public DocumentController(IConvertDocumentUseCase convertDocumentUseCase,
                                   IMergeDocumentUsecase mergeDocumentUsecase,
                                   IEncryptDocumentUsecase encryptDocumentUsecase,
                                   IDecryptDocumentUsecase decryptDocumentUsecase,
-                                  IConvertImageToPdfUsecase convertImageToPdfUsecase)
+                                  IConvertImageToPdfUsecase convertImageToPdfUsecase,
+                                  IConversionJobOrchestrator conversionJobOrchestrator)
         {
             _convertDocumentUseCase = convertDocumentUseCase;
             _mergeDocumentUseCase = mergeDocumentUsecase;
             _encryptDocumentUsecase = encryptDocumentUsecase;
             _decryptDocumentUsecase = decryptDocumentUsecase;
             _convertImageToPdfUsecase = convertImageToPdfUsecase;
+            _conversionJobOrchestrator = conversionJobOrchestrator;
         }
 
         [HttpPost("convert")]
@@ -33,56 +42,61 @@ namespace FileConverter.Api.Controllers
                 return BadRequest("فایل را انتخاب کنید.");
             }
 
-            await using var stream = request.File.OpenReadStream();
+            int userId = User.Identity?.IsAuthenticated == true
+                ? int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!)
+                : 0;
 
-            var result =
-                await _convertDocumentUseCase.ExecuteAsync(stream, request.File.FileName,
-                request.TargetFormat, request.startPage,
-                request.endPage, token);
+            await using var fileBuffer = new FileBufferingReadStream(
+                request.File.OpenReadStream(),
+                memoryThreshold: 80 * 1024,
+                bufferLimit: null,
+                tempFileDirectoryAccessor: () => Path.GetTempPath());
+
+            await fileBuffer.DrainAsync(token);
+
+            ConversionJob? job;
+            try
+            {
+                fileBuffer.Position = 0;
+                job = await _conversionJobOrchestrator.StartJobAsync(
+                    userId, fileBuffer, request.File.FileName,
+                    request.File.ContentType, request.TargetFormat.ToString(), token);
+            }
+            catch (NotSupportedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            fileBuffer.Position = 0;
+
+            var result = await _convertDocumentUseCase.ExecuteAsync(
+                fileBuffer, request.File.FileName, request.TargetFormat,
+                request.startPage, request.endPage, token);
 
             if (!result.Success)
             {
+                await _conversionJobOrchestrator.FailJobAsync(job, result.ErrorMessage!, token);
                 return BadRequest(result.ErrorMessage);
             }
 
-            return File(
-                fileStream: result.OutputStream!,
-                contentType: result.ContentType,
-                fileDownloadName: result.FileName);
-        }
-        [HttpPost("merge")]
-        public async Task<IActionResult> MergePdfs([FromForm] MergePdfRequest request, CancellationToken token)
-        {
-            if(request.Files == null || request.Files.Count < 2 || request.Files.Count > 10)
+            var outputBuffer = new FileBufferingReadStream(
+                result.OutputStream!,
+                memoryThreshold: 80 * 1024,
+                bufferLimit: null,
+                tempFileDirectoryAccessor: () => Path.GetTempPath());
+
+            await outputBuffer.DrainAsync(token);
+            outputBuffer.Position = 0;
+
+            if (job is not null)
             {
-                return BadRequest("حداقل دو فایل و حداکثر ده PDF برای ادغام انتخاب کنید.");
+                await _conversionJobOrchestrator.CompleteJobAsync(
+                    job, userId, outputBuffer, result.FileName!, result.ContentType, token);
+
+                outputBuffer.Position = 0;
             }
 
-            var streams = new List<Stream>();
-            var fileNames = new List<string>();
-
-            foreach(var file in request.Files) 
-            {
-                if(file.Length == 0)
-                {
-                    return BadRequest("این فایل خالی است " + file.FileName);
-                }
-
-                streams.Add(file.OpenReadStream());
-                fileNames.Add(file.FileName);
-            }
-
-            var result = await _mergeDocumentUseCase.ExecuteAsync(streams, fileNames, token);
-
-            if (!result.Success)
-            {
-                return BadRequest(result.ErrorMessage);
-            }
-
-            return File(
-            fileStream: result.OutputStream!,
-            contentType: result.ContentType,
-            fileDownloadName: result.FileName);
+            return File(outputBuffer, result.ContentType, result.FileName);
         }
         [HttpPost("encrypt")]
         public async Task<IActionResult> EncryptPdf([FromForm] EncryptDecryptPdfRequest request, CancellationToken token)
