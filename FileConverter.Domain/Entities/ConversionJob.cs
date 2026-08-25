@@ -4,7 +4,7 @@ namespace FileConverter.Domain.Entities
 {
     public class ConversionJob
     {
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         public int UserId { get; set; }
         public User User { get; set; } = null!;
         public string? OriginalFileUrl { get; set; }
@@ -14,6 +14,7 @@ namespace FileConverter.Domain.Entities
         public MediaCategory TargetCategory { get; set; }
         public string TargetFormat { get; set; } = null!;
         public ConversionStatus Status { get; set; } = ConversionStatus.Pending;
+        public Guid FolderId { get; set; }
         public string? ErrorMessage { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? CompletedAt { get; set; }
