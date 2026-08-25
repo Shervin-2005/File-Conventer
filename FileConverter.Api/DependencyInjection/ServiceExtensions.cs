@@ -4,16 +4,19 @@ using FileConverter.Application.Interfaces.AuthInterfaces;
 using FileConverter.Application.Interfaces.DocumentServiceInterfaces;
 using FileConverter.Application.Interfaces.ImageServiceInterfaces;
 using FileConverter.Application.Interfaces.VideoServiceInterfaces;
+using FileConverter.Application.UseCases.Implementations;
 using FileConverter.Application.UseCases.Implementations.AudioImplementations;
 using FileConverter.Application.UseCases.Implementations.AuthImplementations;
 using FileConverter.Application.UseCases.Implementations.DocumentConversionImplementations;
 using FileConverter.Application.UseCases.Implementations.ImagesConversionImplementations;
 using FileConverter.Application.UseCases.Implementations.VideosConversionsImplementations;
+using FileConverter.Application.UseCases.Interfaces;
 using FileConverter.Application.UseCases.Interfaces.AudioInterfaces;
 using FileConverter.Application.UseCases.Interfaces.AuthInterfaces;
 using FileConverter.Application.UseCases.Interfaces.DocumentConversionInterfaces;
 using FileConverter.Application.UseCases.Interfaces.ImagesConversionsInterfaces;
 using FileConverter.Application.UseCases.Interfaces.VideoInterfaces;
+using FileConverter.Infrastracture.Services;
 using FileConverter.Infrastracture.Services.Audios;
 using FileConverter.Infrastracture.Services.Document;
 using FileConverter.Infrastracture.Services.Images;
@@ -64,6 +67,8 @@ public static class ServiceExtensions
         //User
         services.AddScoped<IImageStorageService, S3ImageStorageService>();
 
+        services.AddHostedService <ConversionJobCleanupService>();
+
         return services;
     }
 
@@ -89,6 +94,10 @@ public static class ServiceExtensions
         services.AddScoped<IAuthUseCase, AuthUseCase>();
         services.AddScoped<IOtpUseCase, OtpUseCase>();
         services.AddScoped<IUserUseCase, UserUseCase>();
+
+        //UserJobsHistory
+        services.AddScoped<IConversionJobUseCase, ConversionJobUseCase>();
+        services.AddScoped<IConversionJobOrchestrator, ConversionJobOrchestrator>();
 
         return services;
     }
