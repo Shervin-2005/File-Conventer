@@ -1,6 +1,7 @@
 ﻿using FileConverter.Application.Interfaces;
 using FileConverter.Application.Interfaces.AuthInterfaces;
 using FileConverter.Infrastracture.Data;
+using FileConverter.Infrastracture.Repositories;
 
 namespace Infrastructure.Repositories
 {
@@ -10,6 +11,7 @@ namespace Infrastructure.Repositories
         private IUserRepository _userRepository;
         private IOtpVerificationRepository? _otpVerifications;
         private IRefreshTokenRepository? _refreshTokens;
+        private IConversionJobHistoryRepository? _conversionJobs;
 
         public UnitOfWork(AppDbContext context)
         {
@@ -22,6 +24,11 @@ namespace Infrastructure.Repositories
         
         public IRefreshTokenRepository RefreshTokens =>
             _refreshTokens ??= new RefreshTokenRepository(_context);
+
+        public IConversionJobHistoryRepository ConversionJobs =>
+            _conversionJobs ??= new ConversionJobHistoryRepository(_context);
+
+
 
         public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
 

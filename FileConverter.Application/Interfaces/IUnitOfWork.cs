@@ -7,6 +7,8 @@ namespace FileConverter.Application.Interfaces
         IOtpVerificationRepository OtpVerifications { get; }
         IRefreshTokenRepository? RefreshTokens {  get; }
         IUserRepository Users {  get; }
+        IConversionJobHistoryRepository ConversionJobs {  get; }
+
 
         Task<int> SaveChangesAsync();
     }
