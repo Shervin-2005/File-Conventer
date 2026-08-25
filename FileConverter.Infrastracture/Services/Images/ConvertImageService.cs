@@ -92,7 +92,7 @@ public class ConvertImageSevice : IConvertImageSevice
             dynamic sys = Py.Import("sys");
             
             // ✅ اصلاح مسیر پایتون مشابه سرویس‌های دیگر (بر اساس ساختار پروژه شما)
-            sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Images\PythonScripts");
+            sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Services\Images\PythonScripts");
 
             var image = new PyString(imageFilePath);
             var output = new PyString(outputPath);
