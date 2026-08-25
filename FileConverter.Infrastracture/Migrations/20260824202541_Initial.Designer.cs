@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FileConverter.Infrastracture.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260822205819_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20260824202541_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,11 @@ namespace FileConverter.Infrastracture.Migrations
 
             modelBuilder.Entity("FileConverter.Domain.Entities.ConversionJob", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("CompletedAt")
                         .HasColumnType("timestamp with time zone");
@@ -40,6 +42,9 @@ namespace FileConverter.Infrastracture.Migrations
                     b.Property<string>("ErrorMessage")
                         .HasMaxLength(2000)
                         .HasColumnType("character varying(2000)");
+
+                    b.Property<Guid>("FolderId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("OriginalFileUrl")
                         .HasColumnType("text");
@@ -215,7 +220,6 @@ namespace FileConverter.Infrastracture.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserName")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
@@ -224,6 +228,11 @@ namespace FileConverter.Infrastracture.Migrations
                     b.HasIndex("PhoneNumber")
                         .IsUnique()
                         .HasDatabaseName("IX_Users_PhoneNumber_Unique")
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.HasIndex("UserName")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Users_UserName_Unique")
                         .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("Users");

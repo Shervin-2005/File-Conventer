@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FileConverter.Infrastracture.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,7 +36,7 @@ namespace FileConverter.Infrastracture.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    UserName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     PasswordHash = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     PhoneNumber = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     ProfileUrl = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
@@ -56,7 +56,8 @@ namespace FileConverter.Infrastracture.Migrations
                 name: "ConversionJobs",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     OriginalFileUrl = table.Column<string>(type: "text", nullable: true),
                     OutputFileUrl = table.Column<string>(type: "text", nullable: true),
@@ -65,6 +66,7 @@ namespace FileConverter.Infrastracture.Migrations
                     TargetCategory = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     TargetFormat = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    FolderId = table.Column<Guid>(type: "uuid", nullable: false),
                     ErrorMessage = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
@@ -145,6 +147,13 @@ namespace FileConverter.Infrastracture.Migrations
                 name: "IX_Users_PhoneNumber_Unique",
                 table: "Users",
                 column: "PhoneNumber",
+                unique: true,
+                filter: "\"IsDeleted\" = false");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_UserName_Unique",
+                table: "Users",
+                column: "UserName",
                 unique: true,
                 filter: "\"IsDeleted\" = false");
         }
