@@ -77,7 +77,7 @@ namespace FileConverter.Infrastracture.Services.Document
                 try
                 {
                     dynamic sys = Py.Import("sys");
-                    sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Document\PythonScripts");
+                    sys.path.append(@"E:\Project\File Converter\FileConverter.Infrastracture\Services\Document\PythonScripts");
 
                     var pdf = new PyString(pdfFilePath);
                     var output = new PyString(outputPath);

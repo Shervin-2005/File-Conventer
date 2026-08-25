@@ -72,7 +72,7 @@ namespace FileConverter.Infrastracture.Services.Document
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
-                sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Document\PythonScripts");
+                sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Services\Document\PythonScripts");
 
                 var docx = new PyString(docxFilePath);
                 var output = new PyString(outputPath);

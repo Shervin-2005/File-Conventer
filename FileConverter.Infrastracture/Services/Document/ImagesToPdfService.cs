@@ -111,7 +111,7 @@ namespace FileConverter.Infrastracture.Services.Document
                     // project's PythonScripts folder (it should match the same
                     // base path used in DocxToPdfConversionService — double check
                     // this hasn't gone stale after a folder rename/move).
-                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Document\PythonScripts");
+                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Services\Document\PythonScripts");
 
                     using var pyPathsList = new PyList();
                     foreach (var path in pdfFilePaths)
