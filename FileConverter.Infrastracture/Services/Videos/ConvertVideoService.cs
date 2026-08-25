@@ -92,7 +92,7 @@ namespace FileConverter.Infrastracture.Services.Videos
                 try
                 {
                     dynamic sys = Py.Import("sys");
-                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Videos\PythonScripts");
+                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Services\Videos\PythonScripts");
                     var video = new PyString(videoFilePath);
                     var output = new PyString(outputPath);
                     var format = new PyString(targetExtension);

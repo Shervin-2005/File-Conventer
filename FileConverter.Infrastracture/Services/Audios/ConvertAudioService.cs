@@ -87,7 +87,7 @@ namespace FileConverter.Infrastracture.Services.Audios
                     dynamic sys = Py.Import("sys");
                     
                     // ✅ مسیر یکپارچه شد مشابه DocxToTextConversionService
-                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Audios\PythonScripts");
+                    sys.path.append(@"D:\Project\C#\File-Converter-Backend\File-Conventer\FileConverter.Infrastracture\Services\Audios\PythonScripts");
 
                     var audio = new PyString(audioFilePath);
                     var output = new PyString(outputPath);
